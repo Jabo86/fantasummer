@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FANTA SUMMER - Star dell'Estate</title>
+    <style>
+        :root {
+            --primary: #FF6B6B;
+            --secondary: #4ECDC4;
+            --accent: #FFE66D;
+            --dark: #292F36;
+            --light: #F7FFF7;
+        }
+        
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background-color: var(--light);
+            color: var(--dark);
+            margin: 0;
+            padding: 0;
+            background-image: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: rgba(247, 255, 247, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            margin-top: 30px;
+            margin-bottom: 30px;
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px 0;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            margin: 0;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .tagline {
+            font-style: italic;
+            margin-top: 10px;
+        }
+        
+        .game-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .challenge-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+            width: 100%;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            position: relative;
+            border: 3px solid var(--accent);
+        }
+        
+        .challenge-number {
+            position: absolute;
+            top: -15px;
+            left: -15px;
+            background-color: var(--primary);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .challenge-text {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .points {
+            font-weight: bold;
+            color: var(--secondary);
+            font-size: 1.1em;
+        }
+        
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1em;
+        }
+        
+        .complete-btn {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .complete-btn:hover {
+            background-color: #3aa8a0;
+            transform: translateY(-2px);
+        }
+        
+        .skip-btn {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .skip-btn:hover {
+            background-color: #e05a5a;
+            transform: translateY(-2px);
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            margin-bottom: 30px;
+            background-color: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-box {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            color: var(--dark);
+        }
+        
+        .global-leaderboard {
+            width: 100%;
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            display: none; /* Nascosta finché non si registra */
+        }
+        
+        .leaderboard-title {
+            text-align: center;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+        
+        .global-leaderboard table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .global-leaderboard th, .global-leaderboard td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #eee;
+        }
+        
+        .global-leaderboard th {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .global-leaderboard tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        .celebration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            color: white;
+            display: none;
+        }
+        
+        .celebration h2 {
+            font-size: 3em;
+            color: var(--accent);
+            text-align: center;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        
+        .celebration p {
+            font-size: 1.5em;
+            text-align: center;
+            max-width: 80%;
+        }
+        
+        .close-celebration {
+            margin-top: 30px;
+            padding: 10px 30px;
+            background-color: var(--primary);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                margin: 10px;
+                padding: 15px;
+            }
+            
+            .stats {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>FANTA SUMMER</h1>
+            <p class="tagline">100 sfide per diventare la Star dell'Estate!</p>
+        </header>
+        
+        <div class="game-area">
+            <div class="stats">
+                <div class="stat-box">
+                    <div class="stat-value" id="completed-count">0</div>
+                    <div class="stat-label">Completate</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="total-points">0</div>
+                    <div class="stat-label">Punti</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="remaining-count">100</div>
+                    <div class="stat-label">Rimaste</div>
+                </div>
+            </div>
+            
+            <div class="challenge-card">
+                <div class="challenge-number" id="challenge-number">1</div>
+                <div class="challenge-text" id="challenge-text">Clicca su "Nuova Sfida" per iniziare la tua avventura estiva!</div>
+                <div class="points">Punti: <span id="challenge-points">0</span></div>
+                <div class="buttons">
+                    <button id="complete-btn" class="complete-btn">Completata!</button>
+                    <button id="skip-btn" class="skip-btn">Salta Sfida</button>
+                    <button id="new-challenge-btn" class="complete-btn">Nuova Sfida</button>
+                </div>
+            </div>
+            
+            <div class="global-leaderboard" id="global-leaderboard">
+                <h3 class="leaderboard-title">Classifica Amici</h3>
+                <div id="global-leaderboard-content">
+                    <!-- La griglia verrà popolata da JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="celebration" id="celebration">
+        <h2>COMPLIMENTI!</h2>
+        <p id="celebration-message">Hai completato una sfida e guadagnato punti!</p>
+        <button class="close-celebration" id="close-celebration">Continua a Giocare</button>
+    </div>
+    
+    <script>
+        // Lista di 100 sfide adatte a bambini di 11 anni
+        const challenges = [
+            { text: "Disegna un castello di sabbia", points: 10 },
+            { text: "Raccogli 5 conchiglie diverse", points: 10 },
+            { text: "Crea un aquilone con carta colorata", points: 15 },
+            { text: "Gioca a nascondino con gli amici", points: 10 },
+            { text: "Fai una foto a un fiore", points: 10 },
+            { text: "Mangia un gelato con un amico", points: 10 },
+            { text: "Costruisci una capanna con coperte", points: 15 },
+            { text: "Impara una canzone estiva", points: 10 },
+            { text: "Disegna il mare con i pastelli", points: 10 },
+            { text: "Organizza una gara di corsa", points: 15 },
+            { text: "Crea un braccialetto con perline", points: 10 },
+            { text: "Leggi una storia sotto un albero", points: 10 },
+            { text: "Fai un picnic con la famiglia", points: 15 },
+            { text: "Trova una nuvola a forma di animale", points: 10 },
+            { text: "Gioca a palla in giardino", points: 10 },
+            { text: "Crea una barchetta di carta", points: 15 },
+            { text: "Scrivi una poesia sull’estate", points: 10 },
+            { text: "Fai bolle di sapone giganti", points: 10 },
+            { text: "Organizza una caccia al tesoro", points: 15 },
+            { text: "Disegna un arcobaleno con i gessetti", points: 10 },
+            { text: "Impara il nome di 3 alberi", points: 10 },
+            { text: "Fai un collage con foglie", points: 15 },
+            { text: "Gioca a campana", points: 10 },
+            { text: "Crea una maschera di carta", points: 10 },
+            { text: "Disegna con la sabbia colorata", points: 15 },
+            { text: "Trova un sasso a forma di cuore", points: 10 },
+            { text: "Gioca a ruba bandiera", points: 10 },
+            { text: "Crea un ventaglio di carta", points: 15 },
+            { text: "Scrivi una lettera a un amico", points: 10 },
+            { text: "Costruisci un castello con i lego", points: 10 },
+            { text: "Organizza una gara di salto", points: 15 },
+            { text: "Disegna un animale marino", points: 10 },
+            { text: "Impara a fare un nodo", points: 10 },
+            { text: "Fai un picnic con cibi a forma di stella", points: 15 },
+            { text: "Crea un segnalibro decorato", points: 10 },
+            { text: "Gioca a tris sulla sabbia", points: 10 },
+            { text: "Fai un disegno con gli acquerelli", points: 15 },
+            { text: "Trova 3 tipi di foglie", points: 10 },
+            { text: "Scrivi una storia estiva", points: 10 },
+            { text: "Organizza un torneo di frisbee", points: 15 },
+            { text: "Fai un cappello di carta", points: 10 },
+            { text: "Gioca a memory con carte", points: 10 },
+            { text: "Crea un mosaico con carta", points: 15 },
+            { text: "Scrivi il tuo nome con i sassi", points: 10 },
+            { text: "Disegna un tramonto", points: 10 },
+            { text: "Organizza una gara di aquiloni", points: 15 },
+            { text: "Crea un quadro riciclato", points: 10 },
+            { text: "Gioca a palla avvelenata", points: 10 },
+            { text: "Fai un disegno di gruppo", points: 15 },
+            { text: "Crea un burattino di carta", points: 10 },
+            { text: "Gioca a un gioco da tavolo", points: 10 },
+            { text: "Fai un fiore di carta", points: 15 },
+            { text: "Trova un insetto e disegnalo", points: 10 },
+            { text: "Crea una bandiera personalizzata", points: 10 },
+            { text: "Organizza una gara di bolle", points: 15 },
+            { text: "Disegna una mappa del tesoro", points: 10 },
+            { text: "Gioca a “un, due, tre, stella”", points: 10 },
+            { text: "Fai un braccialetto con fili", points: 15 },
+            { text: "Crea un puzzle con carta", points: 10 },
+            { text: "Disegna un albero colorato", points: 10 },
+            { text: "Organizza un picnic al tramonto", points: 15 },
+            { text: "Fai un disegno con le dita", points: 10 },
+            { text: "Gioca a sciarada", points: 10 },
+            { text: "Crea un acquario di carta", points: 15 },
+            { text: "Trova un sasso colorato", points: 10 },
+            { text: "Disegna una nave pirata", points: 10 },
+            { text: "Fai un torneo di hula hoop", points: 15 },
+            { text: "Crea un diario estivo", points: 10 },
+            { text: "Gioca a mosca cieca", points: 10 },
+            { text: "Fai un disegno con i pennarelli", points: 15 },
+            { text: "Crea un arco di carta", points: 10 },
+            { text: "Disegna una spiaggia", points: 10 },
+            { text: "Organizza una gara di disegno", points: 15 },
+            { text: "Fai un aeroplanino di carta", points: 10 },
+            { text: "Gioca a lupo mangia frutta", points: 10 },
+            { text: "Crea un sole di carta", points: 15 },
+            { text: "Trova una foglia a forma di cuore", points: 10 },
+            { text: "Disegna un delfino", points: 10 },
+            { text: "Fai un torneo di salto in lungo", points: 15 },
+            { text: "Crea una lanterna di carta", points: 10 },
+            { text: "Gioca a bandiera", points: 10 },
+            { text: "Fai un disegno con la colla glitter", points: 15 },
+            { text: "Crea un binocolo di carta", points: 10 },
+            { text: "Disegna un arcobaleno", points: 10 },
+            { text: "Organizza una gara di barchette", points: 15 },
+            { text: "Fai un disegno con le tempere", points: 10 },
+            { text: "Gioca a tira e molla", points: 10 },
+            { text: "Crea un pesce di carta", points: 15 },
+            { text: "Trova un fiore colorato", points: 10 },
+            { text: "Disegna una palma", points: 10 },
+            { text: "Fai un torneo di cerchi", points: 15 },
+            { text: "Crea una corona di carta", points: 10 },
+            { text: "Gioca a campana gigante", points: 10 },
+            { text: "Fai un disegno con i pennelli", points: 15 },
+            { text: "Crea un cuore di carta", points: 10 },
+            { text: "Disegna un gabbiano", points: 10 },
+            { text: "Organizza una gara di canto", points: 15 },
+            { text: "Completa tutte le sfide e diventa la Star dell’Estate!", points: 50 }
+        ];
+
+        // Stato del gioco
+        let gameState = {
+            playerName: "",
+            completedChallenges: [],
+            currentChallenge: null,
+            totalPoints: 0,
+            dailyChallenges: { date: "", count: 0 }, // Traccia le sfide giornaliere
+            globalPlayers: [] // Inizia vuoto, si popola con i concorrenti
+        };
+
+        // Elementi del DOM
+        const challengeTextEl = document.getElementById('challenge-text');
+        const challengePointsEl = document.getElementById('challenge-points');
+        const challengeNumberEl = document.getElementById('challenge-number');
+        const completedCountEl = document.getElementById('completed-count');
+        const totalPointsEl = document.getElementById('total-points');
+        const remainingCountEl = document.getElementById('remaining-count');
+        const completeBtn = document.getElementById('complete-btn');
+        const skipBtn = document.getElementById('skip-btn');
+        const newChallengeBtn = document.getElementById('new-challenge-btn');
+        const globalLeaderboardEl = document.getElementById('global-leaderboard-content');
+        const globalLeaderboardContainer = document.getElementById('global-leaderboard');
+        const celebrationEl = document.getElementById('celebration');
+        const celebrationMessageEl = document.getElementById('celebration-message');
+        const closeCelebrationBtn = document.getElementById('close-celebration');
+
+        // Ottieni la data corrente come stringa (YYYY-MM-DD)
+        function getCurrentDate() {
+            const now = new Date();
+            return now.toISOString().split('T')[0];
+        }
+
+        // Controlla e resetta il conteggio delle sfide giornaliere
+        function checkDailyChallengeLimit() {
+            const currentDate = getCurrentDate();
+            if (gameState.dailyChallenges.date !== currentDate) {
+                gameState.dailyChallenges = { date: currentDate, count: 0 };
+            }
+            return gameState.dailyChallenges.count < 3;
+        }
+
+        // Inizializza il gioco
+        function initGame() {
+            // Chiedi il nome del giocatore
+            let playerName = prompt("Inserisci il tuo nome:");
+            if (!playerName) {
+                playerName = "Giocatore Anonimo";
+            }
+            gameState.playerName = playerName;
+
+            // Carica stato del giocatore
+            const savedState = localStorage.getItem('fantaSummerGameState_' + playerName);
+            if (savedState) {
+                gameState = JSON.parse(savedState);
+            }
+
+            // Carica la classifica globale
+            const savedGlobalPlayers = localStorage.getItem('fantaSummerGlobalPlayers');
+            if (savedGlobalPlayers) {
+                gameState.globalPlayers = JSON.parse(savedGlobalPlayers);
+            }
+
+            // Aggiungi il giocatore corrente alla classifica, se non esiste
+            const playerIndex = gameState.globalPlayers.findIndex(p => p.name === playerName);
+            if (playerIndex === -1 && gameState.globalPlayers.length < 10) {
+                gameState.globalPlayers.push({ name: playerName, points: gameState.totalPoints });
+            } else if (playerIndex !== -1) {
+                gameState.globalPlayers[playerIndex].points = gameState.totalPoints;
+            }
+
+            // Salva la classifica globale
+            localStorage.setItem('fantaSummerGlobalPlayers', JSON.stringify(gameState.globalPlayers));
+
+            // Mostra la classifica solo se il giocatore è registrato
+            globalLeaderboardContainer.style.display = 'block';
+
+            updateStats();
+            renderGlobalLeaderboard();
+            getNewChallenge();
+            newChallengeBtn.style.display = 'none';
+        }
+
+        // Ottieni una nuova sfida casuale
+        function getNewChallenge() {
+            const availableChallenges = challenges.filter(challenge => 
+                !gameState.completedChallenges.some(c => c.text === challenge.text)
+            );
+            
+            if (availableChallenges.length === 0) {
+                challengeTextEl.textContent = "Hai completato tutte le sfide! Sei la Star dell’Estate!";
+                challengePointsEl.textContent = "50";
+                challengeNumberEl.textContent = "100";
+                completeBtn.style.display = 'none';
+                skipBtn.style.display = 'none';
+                newChallengeBtn.style.display = 'none';
+                showCelebration("Hai completato tutte le sfide! Sei la Star dell’Estate!");
+                return;
+            }
+            
+            const randomIndex = Math.floor(Math.random() * availableChallenges.length);
+            gameState.currentChallenge = availableChallenges[randomIndex];
+            
+            challengeTextEl.textContent = gameState.currentChallenge.text;
+            challengePointsEl.textContent = gameState.currentChallenge.points;
+            challengeNumberEl.textContent = gameState.completedChallenges.length + 1;
+            
+            completeBtn.style.display = 'inline-block';
+            skipBtn.style.display = 'inline-block';
+            newChallengeBtn.style.display = 'none';
+        }
+
+        // Completa la sfida corrente
+        function completeChallenge() {
+            if (!gameState.currentChallenge) return;
+
+            // Controlla il limite giornaliero
+            if (!checkDailyChallengeLimit()) {
+                showCelebration("Hai raggiunto il limite di 3 sfide per oggi! Torna domani!");
+                completeBtn.style.display = 'none';
+                skipBtn.style.display = 'none';
+                newChallengeBtn.style.display = 'inline-block';
+                return;
+            }
+
+            gameState.completedChallenges.push(gameState.currentChallenge);
+            gameState.totalPoints += gameState.currentChallenge.points;
+            gameState.dailyChallenges.count += 1;
+            
+            // Aggiorna la classifica globale
+            const playerIndex = gameState.globalPlayers.findIndex(p => p.name === gameState.playerName);
+            if (playerIndex !== -1) {
+                gameState.globalPlayers[playerIndex].points = gameState.totalPoints;
+            }
+
+            // Simula progresso per altri giocatori
+            gameState.globalPlayers.forEach(player => {
+                if (player.name !== gameState.playerName) {
+                    // 50% di probabilità di guadagnare punti
+                    if (Math.random() > 0.5) {
+                        player.points += Math.floor(Math.random() * 6); // Incremento casuale 0-5
+                    }
+                }
+            });
+            
+            showCelebration(`Hai completato la sfida "${gameState.currentChallenge.text}" e guadagnato ${gameState.currentChallenge.points} punti!`);
+            updateStats();
+            
+            // Salva stato del giocatore e classifica globale
+            localStorage.setItem('fantaSummerGameState_' + gameState.playerName, JSON.stringify(gameState));
+            localStorage.setItem('fantaSummerGlobalPlayers', JSON.stringify(gameState.globalPlayers));
+            
+            renderGlobalLeaderboard();
+            completeBtn.style.display = 'none';
+            skipBtn.style.display = 'none';
+            newChallengeBtn.style.display = 'inline-block';
+        }
+
+        // Salta la sfida corrente
+        function skipChallenge() {
+            if (!gameState.currentChallenge) return;
+            
+            completeBtn.style.display = 'none';
+            skipBtn.style.display = 'none';
+            newChallengeBtn.style.display = 'inline-block';
+            
+            setTimeout(getNewChallenge, 500);
+        }
+
+        // Aggiorna le statistiche
+        function updateStats() {
+            completedCountEl.textContent = gameState.completedChallenges.length;
+            totalPointsEl.textContent = gameState.totalPoints;
+            remainingCountEl.textContent = challenges.length - gameState.completedChallenges.length;
+        }
+
+        // Renderizza la classifica globale
+        function renderGlobalLeaderboard() {
+            globalLeaderboardEl.innerHTML = `
+                <table>
+                    <tr>
+                        <th>Posizione</th>
+                        <th>Nome concorrente</th>
+                        <th>Punti</th>
+                    </tr>
+            `;
+            
+            const sortedPlayers = [...gameState.globalPlayers].sort((a, b) => b.points - a.points);
+            
+            sortedPlayers.forEach((player, index) => {
+                globalLeaderboardEl.innerHTML += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td${player.name === gameState.playerName ? ' style="color: var(--primary); font-weight: bold;"' : ''}>${player.name}</td>
+                        <td>${player.points} pts</td>
+                    </tr>
+                `;
+            });
+            
+            globalLeaderboardEl.innerHTML += '</table>';
+        }
+
+        // Mostra il messaggio di celebrazione
+        function showCelebration(message) {
+            celebrationMessageEl.textContent = message;
+            celebrationEl.style.display = 'flex';
+        }
+
+        // Chiudi il messaggio di celebrazione
+        function closeCelebration() {
+            celebrationEl.style.display = 'none';
+            getNewChallenge();
+        }
+
+        // Aggiornamento giornaliero alle 12:00
+        function checkDailyUpdate() {
+            const now = new Date();
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+            
+            if (hours === 12 && minutes === 0) {
+                // Simula progresso per altri giocatori
+                gameState.globalPlayers.forEach(player => {
+                    if (player.name !== gameState.playerName) {
+                        player.points += Math.floor(Math.random() * 11); // Incremento casuale 0-10
+                    }
+                });
+                localStorage.setItem('fantaSummerGlobalPlayers', JSON.stringify(gameState.globalPlayers));
+                renderGlobalLeaderboard();
+            }
+        }
+
+        // Controlla ogni minuto
+        setInterval(checkDailyUpdate, 60000);
+
+        // Event listeners
+        completeBtn.addEventListener('click', completeChallenge);
+        skipBtn.addEventListener('click', skipChallenge);
+        newChallengeBtn.addEventListener('click', getNewChallenge);
+        closeCelebrationBtn.addEventListener('click', closeCelebration);
+
+        // Inizia il gioco
+        initGame();
+    </script>
+</body>
+</html>
