@@ -56,10 +56,36 @@
             margin-top: 10px;
         }
         
+        .game-info {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            border: 2px solid var(--accent);
+        }
+        
+        .game-info h2 {
+            color: var(--primary);
+            margin-top: 0;
+            font-size: 1.8em;
+        }
+        
+        .game-info p {
+            font-size: 1.1em;
+            line-height: 1.5;
+            color: var(--dark);
+        }
+        
         .game-area {
             display: flex;
             flex-direction: column;
             align-items: center;
+        }
+        
+        .player-btn-container {
+            margin-bottom: 20px;
         }
         
         .challenge-card {
@@ -275,6 +301,15 @@
         </header>
         
         <div class="game-area">
+            <div class="game-info">
+                <h2>Benvenuti a Fanta Summer!</h2>
+                <p>Divertiti con 100 sfide estive per diventare la <strong>Star dell’Estate</strong>! Puoi completare <strong>fino a 3 sfide al giorno</strong>. Clicca su "Completata!" quando finisci una sfida o su "Salta Sfida" se vuoi provare un’altra. Usa il pulsante <strong>Aggiungi/Modifica Concorrente</strong> per inserire o cambiare il tuo nome. Dopo esserti registrato, vedrai la <strong>classifica</strong> con i punteggi di tutti! La classifica si aggiorna ogni volta che qualcuno completa una sfida e ogni giorno alle 12:00. Buon divertimento!</p>
+            </div>
+            
+            <div class="player-btn-container">
+                <button id="add-edit-player-btn" class="complete-btn">Aggiungi/Modifica Concorrente</button>
+            </div>
+            
             <div class="stats">
                 <div class="stat-box">
                     <div class="stat-value" id="completed-count">0</div>
@@ -292,7 +327,7 @@
             
             <div class="challenge-card">
                 <div class="challenge-number" id="challenge-number">1</div>
-                <div class="challenge-text" id="challenge-text">Clicca su "Nuova Sfida" per iniziare la tua avventura estiva!</div>
+                <div class="challenge-text" id="challenge-text">Clicca su "Aggiungi/Modifica Concorrente" per iniziare!</div>
                 <div class="points">Punti: <span id="challenge-points">0</span></div>
                 <div class="buttons">
                     <button id="complete-btn" class="complete-btn">Completata!</button>
@@ -413,6 +448,8 @@
             { text: "Crea una corona di carta", points: 10 },
             { text: "Gioca a campana gigante", points: 10 },
             { text: "Fai un disegno con i pennelli", points: 15 },
+            { text: "Crea una collana con conchiglie", points: 15 },
+            { text: "Disegna un faro sul mare", points: 10 },
             { text: "Crea un cuore di carta", points: 10 },
             { text: "Disegna un gabbiano", points: 10 },
             { text: "Organizza una gara di canto", points: 15 },
@@ -439,6 +476,7 @@
         const completeBtn = document.getElementById('complete-btn');
         const skipBtn = document.getElementById('skip-btn');
         const newChallengeBtn = document.getElementById('new-challenge-btn');
+        const addEditPlayerBtn = document.getElementById('add-edit-player-btn');
         const globalLeaderboardEl = document.getElementById('global-leaderboard-content');
         const globalLeaderboardContainer = document.getElementById('global-leaderboard');
         const celebrationEl = document.getElementById('celebration');
@@ -460,19 +498,27 @@
             return gameState.dailyChallenges.count < 3;
         }
 
-        // Inizializza il gioco
-        function initGame() {
-            // Chiedi il nome del giocatore
+        // Aggiungi o modifica concorrente
+        function addOrEditPlayer() {
+            const oldName = gameState.playerName;
             let playerName = prompt("Inserisci il tuo nome:");
             if (!playerName) {
                 playerName = "Giocatore Anonimo";
             }
+
             gameState.playerName = playerName;
 
-            // Carica stato del giocatore
+            // Carica stato del giocatore, se esiste
             const savedState = localStorage.getItem('fantaSummerGameState_' + playerName);
             if (savedState) {
                 gameState = JSON.parse(savedState);
+                gameState.playerName = playerName; // Mantieni il nome aggiornato
+            } else {
+                // Nuovo giocatore: resetta i progressi
+                gameState.completedChallenges = [];
+                gameState.currentChallenge = null;
+                gameState.totalPoints = 0;
+                gameState.dailyChallenges = { date: "", count: 0 };
             }
 
             // Carica la classifica globale
@@ -481,20 +527,28 @@
                 gameState.globalPlayers = JSON.parse(savedGlobalPlayers);
             }
 
-            // Aggiungi il giocatore corrente alla classifica, se non esiste
+            // Rimuovi il vecchio nome dalla classifica, se esiste
+            if (oldName) {
+                gameState.globalPlayers = gameState.globalPlayers.filter(p => p.name !== oldName);
+            }
+
+            // Aggiungi o aggiorna il giocatore corrente nella classifica
             const playerIndex = gameState.globalPlayers.findIndex(p => p.name === playerName);
             if (playerIndex === -1 && gameState.globalPlayers.length < 10) {
                 gameState.globalPlayers.push({ name: playerName, points: gameState.totalPoints });
             } else if (playerIndex !== -1) {
                 gameState.globalPlayers[playerIndex].points = gameState.totalPoints;
+            } else {
+                showCelebration("Non ci sono più posti disponibili! Massimo 10 concorrenti.");
+                return;
             }
 
-            // Salva la classifica globale
+            // Salva stato e classifica
+            localStorage.setItem('fantaSummerGameState_' + playerName, JSON.stringify(gameState));
             localStorage.setItem('fantaSummerGlobalPlayers', JSON.stringify(gameState.globalPlayers));
 
-            // Mostra la classifica solo se il giocatore è registrato
+            // Mostra la classifica e aggiorna l'interfaccia
             globalLeaderboardContainer.style.display = 'block';
-
             updateStats();
             renderGlobalLeaderboard();
             getNewChallenge();
@@ -503,6 +557,16 @@
 
         // Ottieni una nuova sfida casuale
         function getNewChallenge() {
+            if (!gameState.playerName) {
+                challengeTextEl.textContent = "Clicca su 'Aggiungi/Modifica Concorrente' per iniziare!";
+                challengePointsEl.textContent = "0";
+                challengeNumberEl.textContent = "1";
+                completeBtn.style.display = 'none';
+                skipBtn.style.display = 'none';
+                newChallengeBtn.style.display = 'inline-block';
+                return;
+            }
+
             const availableChallenges = challenges.filter(challenge => 
                 !gameState.completedChallenges.some(c => c.text === challenge.text)
             );
@@ -532,7 +596,7 @@
 
         // Completa la sfida corrente
         function completeChallenge() {
-            if (!gameState.currentChallenge) return;
+            if (!gameState.currentChallenge || !gameState.playerName) return;
 
             // Controlla il limite giornaliero
             if (!checkDailyChallengeLimit()) {
@@ -578,7 +642,7 @@
 
         // Salta la sfida corrente
         function skipChallenge() {
-            if (!gameState.currentChallenge) return;
+            if (!gameState.currentChallenge || !gameState.playerName) return;
             
             completeBtn.style.display = 'none';
             skipBtn.style.display = 'none';
@@ -658,9 +722,10 @@
         skipBtn.addEventListener('click', skipChallenge);
         newChallengeBtn.addEventListener('click', getNewChallenge);
         closeCelebrationBtn.addEventListener('click', closeCelebration);
+        addEditPlayerBtn.addEventListener('click', addOrEditPlayer);
 
         // Inizia il gioco
-        initGame();
+        getNewChallenge();
     </script>
 </body>
 </html>
